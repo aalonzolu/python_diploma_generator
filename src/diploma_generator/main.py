@@ -148,6 +148,8 @@ def main_csv():
                         help='Path to the csv file containing name, QR Code (optional) and output path(optional) NO '
                              'HEADER')
 
+    parser.add_argument('-D', '--debug', action='store_true', help='Debug mode')
+
     args = parser.parse_args()
 
     single_file = args.output is not None
@@ -171,7 +173,7 @@ def main_csv():
         float(font_size), font_path
     )
 
-    with open(args.csv, "r") as csv_file:
+    with open(args.csv, "r", encoding="UTF-8") as csv_file:
         for line in csv_file:
             if not single_file:
                 diploma_generator = DiplomaGenerator(
@@ -180,8 +182,17 @@ def main_csv():
                     float(w), float(h),
                     float(font_size), font_path
                 )
-            name, qr_code, output = line.split(",")
+            # Split the line into parts
+            parts = line.split(",")
+
+            # Unpack the first three values and ignore the rest
+            name, qr_code, output, *extra = parts[:3]
             diploma_generator.add_diploma_page(name, qr_code)
+            if args.debug:
+                print("[DEBUG]Generating diploma for the following data:")
+                print("Name:", name)
+                print("QR Code:", qr_code)
+                print("Output file name:", output)
             if not single_file:
                 output = output.strip()
                 if output == "":

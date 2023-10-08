@@ -14,7 +14,7 @@ class TestMain(unittest.TestCase):
     def test_main(self):
         name = "Nombre De Ejemplo"
 
-        email = "aalonzolu@gmail.com"
+        email = "hello@lexo.dev"
         email_md5 = hashlib.md5(email.encode('utf-8')).hexdigest()
         asiti_url_qr = "https://asiti.io.gt/events/asiti2023/#" + email_md5
 
