@@ -1,8 +1,9 @@
+# -*- coding: utf-8 -*-
 import os
 import urllib.parse
 import urllib.request
 import argparse
-import hashlib
+import re
 
 from fpdf import FPDF
 
@@ -128,6 +129,10 @@ def main():
     diploma_generator.save(args.output)
 
 
+def clean_string(string):
+    return re.sub(r'[^a-zA-Z0-9ÁÉÍÓÚÑáéíóúñ@ .,]', '', string)
+
+
 def main_csv():
     """
     Same as main but with csv file containing name, QR Code and output path
@@ -173,7 +178,7 @@ def main_csv():
         float(font_size), font_path
     )
 
-    with open(args.csv, "r", encoding="UTF-8") as csv_file:
+    with open(args.csv, 'r', encoding='utf-8') as csv_file:
         for line in csv_file:
             if not single_file:
                 diploma_generator = DiplomaGenerator(
@@ -187,9 +192,15 @@ def main_csv():
 
             # Unpack the first three values and ignore the rest
             name, qr_code, output, *extra = parts[:3]
+            name = clean_string(name.strip())
+            qr_code = qr_code.strip()
+            output = output.strip()
+
+            # Generate the diploma
             diploma_generator.add_diploma_page(name, qr_code)
+
             if args.debug:
-                print("[DEBUG]Generating diploma for the following data:")
+                print("[DEBUG] Generating diploma for the following data:")
                 print("Name:", name)
                 print("QR Code:", qr_code)
                 print("Output file name:", output)
